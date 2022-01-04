@@ -12,8 +12,8 @@ class DataCollectorThread(threading.Thread):
         get_storage()
 
         while True:
-            #print("Running...")
-            expire_data(5)
+            print("Running...")
+            expire_data(15)
             for i in range(1,7):
                 add_measurements(i, get_new_data(i))
             time.sleep(1)
@@ -36,6 +36,6 @@ if __name__ == "__main__":
         stop_collector = True
         collector.join()
 
-    #print("Finished.")
-    #print(storage)
+    print("Finished.")
+    print(storage)
 
