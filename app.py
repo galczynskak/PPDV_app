@@ -12,7 +12,7 @@ class DataCollectorThread(threading.Thread):
         get_storage()
 
         while True:
-            print("Running...")
+            #print("Running...")
             expire_data(15)
             for i in range(1,7):
                 add_measurements(i, get_new_data(i))
