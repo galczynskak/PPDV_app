@@ -7,6 +7,8 @@ from plotly import graph_objects as go
 
 from storage import get_storage
 
+app = dash.Dash()
+
 
 def set_patient_id(n):
     global current_patient
@@ -51,7 +53,43 @@ def legs_plot():
     return fig
 
 
-app = dash.Dash()
+def sensor_plots():
+    patient_id = get_current_patient()
+    if patient_id in get_storage():
+        pd = get_storage()[patient_id]
+        times = np.array(pd["df"]["timestamp"])
+        values = [[], [], [], [], [], []]
+        points = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
+        df = pd["df"]
+        for j in range(0, len(points)):
+            for i in range(0, len(df.index)):
+                values[j].append(df[points[j]][i])
+
+        values = np.array(values)
+    else:
+        times = np.array([0])
+        values = np.array([[0]])
+
+    sensor_L0 = go.Figure([go.Scatter(x=times, y=values[0, :], \
+                                line=dict(color='firebrick', width=4), name='L0')
+                     ])
+    sensor_L1 = go.Figure([go.Scatter(x=times, y=values[1, :], \
+                                      line=dict(color='firebrick', width=4), name='L1')
+                           ])
+    sensor_L2 = go.Figure([go.Scatter(x=times, y=values[2, :], \
+                                      line=dict(color='firebrick', width=4), name='L2')
+                           ])
+    sensor_R0 = go.Figure([go.Scatter(x=times, y=values[3, :], \
+                                      line=dict(color='firebrick', width=4), name='R0')
+                           ])
+    sensor_R1 = go.Figure([go.Scatter(x=times, y=values[4, :], \
+                                      line=dict(color='firebrick', width=4), name='R1')
+                           ])
+    sensor_R2 = go.Figure([go.Scatter(x=times, y=values[5, :], \
+                                      line=dict(color='firebrick', width=4), name='R2')
+                           ])
+
+    return [sensor_L0, sensor_L1, sensor_L2, sensor_R0, sensor_R1, sensor_R2]
 
 
 def create_layout():
@@ -69,7 +107,21 @@ def create_layout():
         ),
         html.Div(id='output-info'),
         dcc.Graph(id='output-plot', figure=legs_plot()), \
-        dcc.Interval(id='input-interval', interval=1000, n_intervals=0)
+        dcc.Interval(id='input-interval', interval=1000, n_intervals=0),
+        html.Div([
+            dcc.Graph(id = 'sensor_L0'),
+            dcc.Interval(id = 'input-sensor-interval-1', interval=1000, n_intervals = 0),
+            dcc.Graph(id = 'sensor_L1'),
+            dcc.Interval(id = 'input-sensor-interval-2', interval=1000, n_intervals = 0),
+            dcc.Graph(id = 'sensor_L2'),
+            dcc.Interval(id = 'input-sensor-interval-3', interval=1000, n_intervals = 0),
+            dcc.Graph(id = 'sensor_R0'),
+            dcc.Interval(id = 'input-sensor-interval-4', interval=1000, n_intervals = 0),
+            dcc.Graph(id = 'sensor_R1'),
+            dcc.Interval(id = 'input-sensor-interval-5', interval=1000, n_intervals = 0),
+            dcc.Graph(id = 'sensor_R2'),
+            dcc.Interval(id = 'input-sensor-interval-6', interval=1000, n_intervals = 0)
+        ])
     ]
                           )
 
@@ -86,3 +138,14 @@ def define_parameters(patient_id):
               [Input(component_id='input-interval', component_property='n_intervals')])
 def graph_update(n_intervals):
     return legs_plot()
+
+
+@app.callback([Output(component_id='sensor_L0', component_property='figure'),
+               Output(component_id='sensor_L1', component_property='figure'),
+               Output(component_id='sensor_L2', component_property='figure'),
+               Output(component_id='sensor_R0', component_property='figure'),
+               Output(component_id='sensor_R1', component_property='figure'),
+               Output(component_id='sensor_R2', component_property='figure')],
+              Input(component_id='input-sensor-interval-1', component_property='n_intervals'))
+def update_sensor_graphs(n_intervals):
+    return sensor_plots()
