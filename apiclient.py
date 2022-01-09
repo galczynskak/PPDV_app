@@ -1,7 +1,6 @@
 import datetime
-import time
-
 import requests
+import time
 
 
 def get_new_data(id):
