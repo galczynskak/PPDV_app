@@ -38,18 +38,21 @@ def legs_plot():
         values = np.array([[0]])
 
     fig = go.Figure([go.Scatter(x=times, y=values[0, :], \
-                                line=dict(color='firebrick', width=4), name='L0')
+                                line=dict(color='#8c510a', width=4), name='L0')
                      ])
     fig.add_traces([go.Scatter(x=times, y=values[1, :], \
-                               line=dict(color='aqua', width=4), name='L1'),
+                               line=dict(color='#d8b365', width=4), name='L1'),
                     go.Scatter(x=times, y=values[2, :], \
-                               line=dict(color='lime', width=4), name='L2'),
+                               line=dict(color='#f6e8c3', width=4), name='L2'),
                     go.Scatter(x=times, y=values[3, :], \
-                               line=dict(color='sandybrown', width=4), name='R0'),
+                               line=dict(color='#c7eae5', width=4), name='R0'),
                     go.Scatter(x=times, y=values[4, :], \
-                               line=dict(color='olivedrab', width=4), name='R1'),
+                               line=dict(color='#5ab4ac', width=4), name='R1'),
                     go.Scatter(x=times, y=values[5, :], \
-                               line=dict(color='rosybrown', width=4), name='R2')])
+                               line=dict(color='#01665e', width=4), name='R2')])
+
+    fig.update_traces(marker=dict(size=7, color = '#FFFFFF',
+                              line=dict(width=2)))
     return fig
 
 
@@ -71,23 +74,41 @@ def sensor_plots():
         values = np.array([[0]])
 
     sensor_L0 = go.Figure([go.Scatter(x=times, y=values[0, :], \
-                                      line=dict(color='firebrick', width=4), name='L0')
+                                      line=dict(color='#8c510a', width=4), name='L0', 
+                                      marker=dict(size=7, color = '#FFFFFF',
+                                      line=dict(width=2)), showlegend=True)
                            ])
+    sensor_L0.update_layout(autosize=False, width=900, height=400)
     sensor_L1 = go.Figure([go.Scatter(x=times, y=values[1, :], \
-                                      line=dict(color='firebrick', width=4), name='L1')
+                                      line=dict(color='#d8b365', width=4), name='L1',
+                                      marker=dict(size=7, color = '#FFFFFF',
+                                      line=dict(width=2)), showlegend=True)
                            ])
+    sensor_L1.update_layout(autosize=False, width=900, height=400)
     sensor_L2 = go.Figure([go.Scatter(x=times, y=values[2, :], \
-                                      line=dict(color='firebrick', width=4), name='L2')
+                                      line=dict(color='#f6e8c3', width=4), name='L2',
+                                      marker=dict(size=7, color = '#FFFFFF',
+                                      line=dict(width=2)), showlegend=True)
                            ])
+    sensor_L2.update_layout(autosize=False, width=900, height=400)
     sensor_R0 = go.Figure([go.Scatter(x=times, y=values[3, :], \
-                                      line=dict(color='firebrick', width=4), name='R0')
+                                      line=dict(color='#c7eae5', width=4), name='R0',
+                                      marker=dict(size=7, color = '#FFFFFF',
+                                      line=dict(width=2)), showlegend=True)
                            ])
+    sensor_R0.update_layout(autosize=False, width=900, height=400)
     sensor_R1 = go.Figure([go.Scatter(x=times, y=values[4, :], \
-                                      line=dict(color='firebrick', width=4), name='R1')
+                                      line=dict(color='#5ab4ac', width=4), name='R1',
+                                      marker=dict(size=7, color = '#FFFFFF',
+                                      line=dict(width=2)), showlegend=True)
                            ])
+    sensor_R1.update_layout(autosize=False, width=900, height=400)
     sensor_R2 = go.Figure([go.Scatter(x=times, y=values[5, :], \
-                                      line=dict(color='firebrick', width=4), name='R2')
+                                      line=dict(color='#01665e', width=4), name='R2',
+                                      marker=dict(size=7, color = '#FFFFFF',
+                                      line=dict(width=2)), showlegend=True)
                            ])
+    sensor_R2.update_layout(autosize=False, width=900, height=400)
 
     return [sensor_L0, sensor_L1, sensor_L2, sensor_R0, sensor_R1, sensor_R2]
 
@@ -98,7 +119,10 @@ def create_layout():
     app.layout = html.Div(id='parent', children=[
         html.H1(id='H1', children='PPDV - walking visualisation', style={'textAlign': 'center', \
                                                                          'marginTop': 40, 'marginBottom': 40}),
-        html.Button('Stop data gathering', id='gather-data', n_clicks=0),
+        html.Button('Stop data gathering', id='gather-data', n_clicks=0, style = {'background-color': '#feedde',
+                                                                                    'color': 'black',
+                                                                                    'height': '50px',
+                                                                                    'width': '200px'}),
         html.Div(id='data-gathering'),
         dcc.Dropdown(
             id='input-dropdown',

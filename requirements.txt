@@ -1,2 +1,7 @@
 pandas
 requests
+numpy
+dash
+plotly
+time
+datetime
