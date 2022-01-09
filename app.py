@@ -1,7 +1,8 @@
+import threading
+
+from apiclient import *
 from dash_app import app, create_layout
 from storage import *
-from apiclient import *
-import threading
 
 stop_collector = False
 
@@ -12,9 +13,8 @@ class DataCollectorThread(threading.Thread):
         get_storage()
 
         while True:
-            #print("Running...")
             expire_data(15)
-            for i in range(1,7):
+            for i in range(1, 7):
                 add_measurements(i, get_new_data(i))
             time.sleep(1)
 
@@ -31,11 +31,10 @@ if __name__ == "__main__":
     collector.start()
 
     try:
-        app.run_server(debug = True)
+        app.run_server(debug=True)
     finally:
         stop_collector = True
         collector.join()
 
     print("Finished.")
     print(storage)
-
