@@ -4,6 +4,7 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output
 from plotly import graph_objects as go
+import dash_table
 
 from storage import get_storage
 
@@ -106,6 +107,11 @@ def create_layout():
             value=1
         ),
         html.Div(id='output-info'),
+        dash_table.DataTable(
+            id='anomalies-table',
+            columns=[{"name":i, "id":i} for i in storage["anomalies"].columns],
+            data=storage["anomalies"].to_dict('records')
+        ),
         dcc.Graph(id='output-plot', figure=legs_plot()), \
         dcc.Interval(id='input-interval', interval=1000, n_intervals=0),
         html.Div([
