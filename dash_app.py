@@ -7,38 +7,37 @@ from storage import get_storage
 import numpy as np
 
 def legs_plot():
-
-    store = get_storage()
-
-    if 1 in store.keys():
-        rec = get_storage()[1]
-        times = np.array(rec["df"]["timestamp"])
-        points = np.array(["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"])
-        df = rec["df"]
-        #import pdb; pdb.set_trace()
-        for y in [0, 1]: #chciałam najpierw spróbować dla 2-ch punków: L0_value i L1_value
-            it = 0 #myślałam, że osobny iterator pomoże - i tak zapisują się identyczne wektory
-            df = rec["df"][points[y]]
-            values = [[]] #dwuwymiarowy
-            for x in range(0, len(df.index)): #żeby na razie zapisać aktualne wartości każdego punktu
-                values[it].append(df[x])
-            it += 1
+    if 1 in get_storage():
+        pd = get_storage()[1]
+        times = np.array(pd["df"]["timestamp"])
+        values = [[], [], [], [], [], []]
+        points = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
+        df = pd["df"]
+        for j in range(0, len(points)):
+            for i in range(0, len(df.index)):
+                values[j].append(df[points[j]][i])
+        
         values = np.array(values)
-        print(values)
-
     else:
         times = np.array([0])
-        values = np.array([[0], [0]])
+        values = np.array([[0]])     
 
-    #print(times)
+    print(times)
     print(values)
 
-
     fig = go.Figure([go.Scatter(x = times, y = values[0, :],\
-        line = dict(color = 'firebrick', width = 4), name = 'L0')
+       line = dict(color = 'firebrick', width = 4), name = 'L0')
     ])
-    # fig.add_trace(go.Scatter(x = times, y = values[1, :],         #żeby dodać kolejną prostą do wykresu
-    #     line = dict(color = 'burlywood', width = 4), name = 'L1'))
+    fig.add_traces([go.Scatter(x = times, y = values[1, :],\
+       line = dict(color = 'aqua', width = 4), name = 'L1'),
+       go.Scatter(x = times, y = values[2, :],\
+       line = dict(color = 'lime', width = 4), name = 'L2'),
+       go.Scatter(x = times, y = values[3, :],\
+       line = dict(color = 'sandybrown', width = 4), name = 'R0'),
+       go.Scatter(x = times, y = values[4, :],\
+       line = dict(color = 'olivedrab', width = 4), name = 'R1'),
+       go.Scatter(x = times, y = values[5, :],\
+       line = dict(color = 'rosybrown', width = 4), name = 'R2')])
     return fig
 
 app = dash.Dash()
