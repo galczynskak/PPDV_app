@@ -129,6 +129,35 @@ def sensor_plots():
 
     return [sensor_L0, sensor_L1, sensor_L2, sensor_R0, sensor_R1, sensor_R2]
 
+def animate_plots():
+    patient_id = get_current_patient()
+    if patient_id in get_storage():
+        pd = get_storage()[patient_id]
+        times = np.array(pd["df"]["timestamp"])
+        values = [[], [], [], [], [], []]
+        points = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
+        df = pd["df"]
+        for j in range(0, len(points)):
+            for i in range(0, len(df.index)):
+                values[j].append(df[points[j]][i])
+
+        values = np.array(values)
+    else:
+        times = np.array([0])
+        values = np.array([[0]])
+
+    v = []
+    for i in range(0, 6):
+        v.append(values[i, :].mean())
+    fig = go.Figure([go.Scatter(x=['L0', 'L1', 'L2', 'R0', 'R1', 'R2'], y=v, mode='markers', marker=dict(
+            color='#feedde',
+            size=40,
+            line=dict(
+                color='#8c510a',
+                width=2
+            )))])
+    fig.update_layout(title_text='Mean value tendencies', title_x=0.5)
+    return fig
 
 def create_layout():
     storage = get_storage()
@@ -165,6 +194,11 @@ def create_layout():
         dcc.Graph(id='output-plot', figure=legs_plot()), \
         dcc.Interval(id='input-interval', interval=1000, n_intervals=0),
         html.Hr(),
+        html.H2("Mean value tendencies", style={'font-family':'Open Sans', 'font-weight':'normal',
+                                                 'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
+        dcc.Graph(id='an_sensor', figure=animate_plots()),
+        html.Hr(),
+        dcc.Interval(id='input-sensor-animate', interval=1000, n_intervals=0),
         html.H2("Detailed sensors plots", style={'font-family':'Open Sans', 'font-weight':'normal',
                                                  'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
         dbc.Row(
@@ -220,6 +254,10 @@ def graph_update(n_intervals):
 def update_sensor_graphs(n_intervals):
     return sensor_plots()
 
+@app.callback(Output(component_id='an_sensor', component_property='figure'),
+              [Input(component_id='input-sensor-animate', component_property='n_intervals')])
+def update_animated_grphs(n_intervals):
+    return animate_plots()
 
 @app.callback(Output(component_id='data-gathering', component_property="children"),
               Input('gather-data', 'n_clicks'))
