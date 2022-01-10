@@ -19,7 +19,6 @@ class DataCollectorThread(threading.Thread):
 
 
 def initiate_collector():
-    print("here")
     global collector
     collector = DataCollectorThread()
     set_collector_state(False)

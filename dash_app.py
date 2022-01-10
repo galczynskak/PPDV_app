@@ -4,10 +4,11 @@ from dash import dcc, callback_context, dash_table
 from dash import html
 from dash.dependencies import Input, Output
 from plotly import graph_objects as go
+import dash_bootstrap_components as dbc
 
 from collector import *
 
-app = dash.Dash()
+app = dash.Dash(external_stylesheets=[dbc.themes.GRID])
 
 
 def set_patient_id(n):
@@ -53,6 +54,13 @@ def legs_plot():
 
     fig.update_traces(marker=dict(size=7, color = '#FFFFFF',
                               line=dict(width=2)))
+
+    fig.update_layout(
+        xaxis_title="timestamp",
+        yaxis_title="value",
+        legend_title="sensors"
+    )
+
     return fig
 
 
@@ -76,39 +84,48 @@ def sensor_plots():
     sensor_L0 = go.Figure([go.Scatter(x=times, y=values[0, :], \
                                       line=dict(color='#8c510a', width=4), name='L0', 
                                       marker=dict(size=7, color = '#FFFFFF',
-                                      line=dict(width=2)), showlegend=True)
+                                      line=dict(width=2)), showlegend=False)
                            ])
-    sensor_L0.update_layout(autosize=False, width=900, height=400)
+    sensor_L0.update_layout(autosize=False, width=900, height=200, title="L0", title_y=0.5,
+                            margin_l=100, margin_b=0, margin_r=0, margin_t=0)
     sensor_L1 = go.Figure([go.Scatter(x=times, y=values[1, :], \
                                       line=dict(color='#d8b365', width=4), name='L1',
                                       marker=dict(size=7, color = '#FFFFFF',
-                                      line=dict(width=2)), showlegend=True)
+                                      line=dict(width=2)), showlegend=False)
                            ])
-    sensor_L1.update_layout(autosize=False, width=900, height=400)
+    sensor_L1.update_layout(autosize=False, width=900, height=200, title="L1", title_y=0.5,
+                            margin_l=100, margin_b=0, margin_r=0, margin_t=0)
     sensor_L2 = go.Figure([go.Scatter(x=times, y=values[2, :], \
                                       line=dict(color='#f6e8c3', width=4), name='L2',
                                       marker=dict(size=7, color = '#FFFFFF',
-                                      line=dict(width=2)), showlegend=True)
+                                      line=dict(width=2)), showlegend=False)
                            ])
-    sensor_L2.update_layout(autosize=False, width=900, height=400)
+    sensor_L2.update_layout(autosize=False, width=900, height=200, title="L1", title_y=0.5,
+                            margin_l=100, margin_b=0, margin_r=0, margin_t=0)
     sensor_R0 = go.Figure([go.Scatter(x=times, y=values[3, :], \
                                       line=dict(color='#c7eae5', width=4), name='R0',
                                       marker=dict(size=7, color = '#FFFFFF',
-                                      line=dict(width=2)), showlegend=True)
+                                      line=dict(width=2)), showlegend=False)
                            ])
-    sensor_R0.update_layout(autosize=False, width=900, height=400)
+    sensor_R0.update_layout(autosize=False, width=900, height=200, title="R0", title_y=0.5, title_x=1.0,
+                            margin_l=0, margin_b=0, margin_r=100, margin_t=0)
+    sensor_R0.update_yaxes(side="right")
     sensor_R1 = go.Figure([go.Scatter(x=times, y=values[4, :], \
                                       line=dict(color='#5ab4ac', width=4), name='R1',
                                       marker=dict(size=7, color = '#FFFFFF',
-                                      line=dict(width=2)), showlegend=True)
+                                      line=dict(width=2)), showlegend=False)
                            ])
-    sensor_R1.update_layout(autosize=False, width=900, height=400)
+    sensor_R1.update_layout(autosize=False, width=900, height=200, title="R1", title_y=0.5, title_x=1.0,
+                            margin_l=0, margin_b=0, margin_r=100, margin_t=0)
+    sensor_R1.update_yaxes(side="right")
     sensor_R2 = go.Figure([go.Scatter(x=times, y=values[5, :], \
                                       line=dict(color='#01665e', width=4), name='R2',
                                       marker=dict(size=7, color = '#FFFFFF',
-                                      line=dict(width=2)), showlegend=True)
+                                      line=dict(width=2)), showlegend=False)
                            ])
-    sensor_R2.update_layout(autosize=False, width=900, height=400)
+    sensor_R2.update_layout(autosize=False, width=900, height=200, title="R2", title_y=0.5, title_x=1.0,
+                            margin_l=0, margin_b=0, margin_r=100, margin_t=0)
+    sensor_R2.update_yaxes(side="right")
 
     return [sensor_L0, sensor_L1, sensor_L2, sensor_R0, sensor_R1, sensor_R2]
 
@@ -117,42 +134,64 @@ def create_layout():
     storage = get_storage()
     set_patient_id(1)
     app.layout = html.Div(id='parent', children=[
-        html.H1(id='H1', children='PPDV - walking visualisation', style={'textAlign': 'center', \
-                                                                         'marginTop': 40, 'marginBottom': 40}),
-        html.Button('Stop data gathering', id='gather-data', n_clicks=0, style = {'background-color': '#feedde',
-                                                                                    'color': 'black',
-                                                                                    'height': '50px',
-                                                                                    'width': '200px'}),
-        html.Div(id='data-gathering'),
-        dcc.Dropdown(
-            id='input-dropdown',
-            options=[
-                {'label': storage[i]["firstname"] + ' ' + storage[i]["lastname"], 'value': i} for i in range(1, 7)
-            ],
-            value=1
+        html.H1(id='H1', children='PPDV - walking visualisation', style={'align-items': 'center', \
+                                                                         'marginTop': 0, 'marginBottom': 10,
+                                                                         'height':120, 'text-align':'middle', 'display':'flex',
+                                                                         'background-color':'darkslategray', 'color': 'white',
+                                                                         'font-family': 'Open Sans', 'font-weight':'normal',
+                                                                         'font-size':40, 'justify-content':'center'}),
+        dbc.Row(
+            [
+                dbc.Col(html.Button('Stop data gathering', id='gather-data', n_clicks=0, style = {'font-family':'Open Sans', 'font-weight':'normal',
+                                                                                                  'background-color': '#feedde',
+                                                                                                  'font-size':16, 'margin-left':10,
+                                                                                                  'color': 'black',
+                                                                                                  'height': '50px',
+                                                                                                  'width': '200px'})),
+                dbc.Col(html.Div(id='data-gathering')),
+                dbc.Col(dcc.Dropdown(
+                    id='input-dropdown',
+                    options=[
+                        {'label': storage[i]["firstname"] + ' ' + storage[i]["lastname"], 'value': i} for i in range(1, 7)
+                    ],
+                    value=1
+                )),
+                dbc.Col(html.Div(id='output-info')),
+            ]
         ),
-        html.Div(id='output-info'),
+        html.Hr(),
+        html.H2("Aggregated sensors plot", style={'font-family':'Open Sans', 'font-weight':'normal',
+                                                 'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
+        dcc.Graph(id='output-plot', figure=legs_plot()), \
+        dcc.Interval(id='input-interval', interval=1000, n_intervals=0),
+        html.Hr(),
+        html.H2("Detailed sensors plots", style={'font-family':'Open Sans', 'font-weight':'normal',
+                                                 'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
+        dbc.Row(
+            [
+                dbc.Col([
+                    dcc.Graph(id='sensor_L0'),
+                    dcc.Interval(id='input-sensor-interval-1', interval=1000, n_intervals=0),
+                    dcc.Graph(id='sensor_L1'),
+                    dcc.Interval(id='input-sensor-interval-2', interval=1000, n_intervals=0),
+                    dcc.Graph(id='sensor_L2'),
+                    dcc.Interval(id='input-sensor-interval-3', interval=1000, n_intervals=0)
+                ]),
+                dbc.Col([
+                    dcc.Graph(id='sensor_R0'),
+                    dcc.Interval(id='input-sensor-interval-4', interval=1000, n_intervals=0),
+                    dcc.Graph(id='sensor_R1'),
+                    dcc.Interval(id='input-sensor-interval-5', interval=1000, n_intervals=0),
+                    dcc.Graph(id='sensor_R2'),
+                    dcc.Interval(id='input-sensor-interval-6', interval=1000, n_intervals=0)
+                ])
+            ]
+        ),
         dash_table.DataTable(
             id='anomalies-table',
             columns=[{"name": i, "id": i} for i in storage["anomalies"].columns],
             data=storage["anomalies"].to_dict('records')
-        ),
-        dcc.Graph(id='output-plot', figure=legs_plot()), \
-        dcc.Interval(id='input-interval', interval=1000, n_intervals=0),
-        html.Div([
-            dcc.Graph(id='sensor_L0'),
-            dcc.Interval(id='input-sensor-interval-1', interval=1000, n_intervals=0),
-            dcc.Graph(id='sensor_L1'),
-            dcc.Interval(id='input-sensor-interval-2', interval=1000, n_intervals=0),
-            dcc.Graph(id='sensor_L2'),
-            dcc.Interval(id='input-sensor-interval-3', interval=1000, n_intervals=0),
-            dcc.Graph(id='sensor_R0'),
-            dcc.Interval(id='input-sensor-interval-4', interval=1000, n_intervals=0),
-            dcc.Graph(id='sensor_R1'),
-            dcc.Interval(id='input-sensor-interval-5', interval=1000, n_intervals=0),
-            dcc.Graph(id='sensor_R2'),
-            dcc.Interval(id='input-sensor-interval-6', interval=1000, n_intervals=0)
-        ])
+        )
     ]
                           )
 
@@ -162,7 +201,7 @@ def create_layout():
 def define_parameters(patient_id):
     storage = get_storage()
     set_patient_id(patient_id)
-    return html.Div(html.H4("Presenting data for patient: " + storage[patient_id]["fullname"]))
+    return html.Div(html.H4("Presenting data for patient: " + storage[patient_id]["fullname"], style={'font-family':'Open Sans', 'font-weight':'normal'}))
 
 
 @app.callback(Output(component_id='output-plot', component_property='figure'),
@@ -193,4 +232,6 @@ def update_data_gathering(n_clicks):
         message = "Data gathering is not active."
     else:
         message = "Data gathering is active."
-    return html.H3(message)
+    return html.H3(message, style={'font-family':'Open Sans', 'font-weight':'normal'})
+
+
