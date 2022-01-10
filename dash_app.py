@@ -171,12 +171,10 @@ def create_layout():
                                                                          'font-size':40, 'justify-content':'center'}),
         dbc.Row(
             [
-                dbc.Col(html.Button('Stop data gathering', id='gather-data', n_clicks=0, style = {'font-family':'Open Sans', 'font-weight':'normal',
-                                                                                                  'background-color': '#feedde',
-                                                                                                  'font-size':16, 'margin-left':10,
-                                                                                                  'color': 'black',
-                                                                                                  'height': '50px',
-                                                                                                  'width': '200px'})),
+                dbc.Col(html.Button('STOP/ACTIVATE\nDATA GATHERING', id='gather-data', n_clicks=0,
+                                    style = {'font-family':'Open Sans', 'font-weight':'normal',
+                                             'background-color': '#feedde', 'font-size':16, 'margin-left':10,
+                                             'color': 'black','height': '50px','width': '200px'})),
                 dbc.Col(html.Div(id='data-gathering')),
                 dbc.Col(dcc.Dropdown(
                     id='input-dropdown',
@@ -221,11 +219,11 @@ def create_layout():
                 ])
             ]
         ),
-        dash_table.DataTable(
-            id='anomalies-table',
-            columns=[{"name": i, "id": i} for i in storage["anomalies"].columns],
-            data=storage["anomalies"].to_dict('records')
-        )
+        html.Hr(),
+        html.H2("Anomalies monitoring dashboard", style={'font-family':'Open Sans', 'font-weight':'normal',
+                                                  'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
+        html.Div(id='live_data'),
+        dcc.Interval(id='data-interval', interval=1000, n_intervals=0)
     ]
                           )
 
@@ -273,3 +271,18 @@ def update_data_gathering(n_clicks):
     return html.H3(message, style={'font-family':'Open Sans', 'font-weight':'normal'})
 
 
+@app.callback(Output(component_id='live_data', component_property='children'),
+              Input(component_id='data-interval', component_property='n_intervals'))
+def update_anomalies(n_intervals):
+    df = get_storage()['anomalies']
+    titles = ["Patient full name", "Measurement ID", "Time", "Sensor ID", "Sensor value"]
+    return html.Div(
+        dash_table.DataTable(
+            id='anomalies-table',
+            columns=[{"name": i, "id": i} for i in titles],
+            data=df.to_dict('records'),
+            style_header={'backgroundColor':"tomato", 'text-align':'center',
+                          'font-family':'Open Sans', 'color':'white'},
+            style_cell={'textAlign':'center','font-family':'Open Sans'},
+            style_table={'width':'80%', 'margin-right':'auto', 'margin-left':'auto'}
+    ))
