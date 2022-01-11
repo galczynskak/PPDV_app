@@ -27,10 +27,11 @@ def legs_plot():
     patient_id = get_current_patient()
     if patient_id in get_storage():
         pd = get_storage()[patient_id]
-        times = np.array(pd["df"]["timestamp"])
+        df = pd["df"]
+        df = df.iloc[-15:]
+        times = np.array(df["timestamp"])
         values = [[], [], [], [], [], []]
         points = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
-        df = pd["df"]
         for j in range(0, len(points)):
             for i in range(0, len(df.index)):
                 values[j].append(df[points[j]][i])
@@ -41,18 +42,18 @@ def legs_plot():
         values = np.array([[0]])
 
     fig = go.Figure([go.Scatter(x=times, y=values[0, :], \
-                                line=dict(color='#8c510a', width=4), name='L0')
+                                line=dict(color='#8c510a', width=2), name='L0')
                      ])
     fig.add_traces([go.Scatter(x=times, y=values[1, :], \
-                               line=dict(color='#d8b365', width=4), name='L1'),
+                               line=dict(color='#d8b365', width=2), name='L1'),
                     go.Scatter(x=times, y=values[2, :], \
-                               line=dict(color='#f6e8c3', width=4), name='L2'),
+                               line=dict(color='#f6e8c3', width=2), name='L2'),
                     go.Scatter(x=times, y=values[3, :], \
-                               line=dict(color='#c7eae5', width=4), name='R0'),
+                               line=dict(color='#c7eae5', width=2), name='R0'),
                     go.Scatter(x=times, y=values[4, :], \
-                               line=dict(color='#5ab4ac', width=4), name='R1'),
+                               line=dict(color='#5ab4ac', width=2), name='R1'),
                     go.Scatter(x=times, y=values[5, :], \
-                               line=dict(color='#01665e', width=4), name='R2')])
+                               line=dict(color='#01665e', width=2), name='R2')])
 
     fig.update_traces(marker=dict(size=7, color = '#FFFFFF',
                               line=dict(width=2)))
@@ -84,28 +85,28 @@ def sensor_plots():
         values = np.array([[0]])
 
     sensor_L0 = go.Figure([go.Scatter(x=times, y=values[0, :], \
-                                      line=dict(color='#8c510a', width=4), name='L0', 
+                                      line=dict(color='#8c510a', width=2), name='L0', 
                                       marker=dict(size=7, color = '#FFFFFF',
                                       line=dict(width=2)), showlegend=False)
                            ])
     sensor_L0.update_layout(autosize=False, width=900, height=200, title="L0", title_y=0.5,
                             margin_l=100, margin_b=0, margin_r=0, margin_t=0)
     sensor_L1 = go.Figure([go.Scatter(x=times, y=values[1, :], \
-                                      line=dict(color='#d8b365', width=4), name='L1',
+                                      line=dict(color='#d8b365', width=2), name='L1',
                                       marker=dict(size=7, color = '#FFFFFF',
                                       line=dict(width=2)), showlegend=False)
                            ])
     sensor_L1.update_layout(autosize=False, width=900, height=200, title="L1", title_y=0.5,
                             margin_l=100, margin_b=0, margin_r=0, margin_t=0)
     sensor_L2 = go.Figure([go.Scatter(x=times, y=values[2, :], \
-                                      line=dict(color='#f6e8c3', width=4), name='L2',
+                                      line=dict(color='#f6e8c3', width=2), name='L2',
                                       marker=dict(size=7, color = '#FFFFFF',
                                       line=dict(width=2)), showlegend=False)
                            ])
     sensor_L2.update_layout(autosize=False, width=900, height=200, title="L1", title_y=0.5,
                             margin_l=100, margin_b=0, margin_r=0, margin_t=0)
     sensor_R0 = go.Figure([go.Scatter(x=times, y=values[3, :], \
-                                      line=dict(color='#c7eae5', width=4), name='R0',
+                                      line=dict(color='#c7eae5', width=2), name='R0',
                                       marker=dict(size=7, color = '#FFFFFF',
                                       line=dict(width=2)), showlegend=False)
                            ])
@@ -113,7 +114,7 @@ def sensor_plots():
                             margin_l=0, margin_b=0, margin_r=100, margin_t=0)
     sensor_R0.update_yaxes(side="right")
     sensor_R1 = go.Figure([go.Scatter(x=times, y=values[4, :], \
-                                      line=dict(color='#5ab4ac', width=4), name='R1',
+                                      line=dict(color='#5ab4ac', width=2), name='R1',
                                       marker=dict(size=7, color = '#FFFFFF',
                                       line=dict(width=2)), showlegend=False)
                            ])
@@ -121,7 +122,7 @@ def sensor_plots():
                             margin_l=0, margin_b=0, margin_r=100, margin_t=0)
     sensor_R1.update_yaxes(side="right")
     sensor_R2 = go.Figure([go.Scatter(x=times, y=values[5, :], \
-                                      line=dict(color='#01665e', width=4), name='R2',
+                                      line=dict(color='#01665e', width=2), name='R2',
                                       marker=dict(size=7, color = '#FFFFFF',
                                       line=dict(width=2)), showlegend=False)
                            ])

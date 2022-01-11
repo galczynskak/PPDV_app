@@ -12,7 +12,7 @@ class DataCollectorThread(threading.Thread):
         while True:
             stop_collector = get_collector_state()
             if not stop_collector:
-                expire_data(15)
+                expire_data(600)
                 for i in range(1, 7):
                     try:
                         add_measurements(i, get_new_data(i))
