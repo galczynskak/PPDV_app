@@ -27,24 +27,23 @@ def legs_plot():
     patient_id = get_current_patient()
     if patient_id in get_storage():
         pd = get_storage()[patient_id]
-        df = pd["df"]
-        df = df.iloc[-15:]
+        df = pd["df"].iloc[-15:]
         times = np.array(df["timestamp"])
         values = [[], [], [], [], [], []]
         points = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
         for j in range(0, len(points)):
             for i in range(0, len(df.index)):
-                values[j].append(df[points[j]][i])
+                values[j].append(df[points[j]].iloc[i])
 
         values = np.array(values)
     else:
         times = np.array([0])
         values = np.array([[0]])
 
-    fig = go.Figure([go.Scatter(x=times, y=values[0, :], \
-                                line=dict(color='#8c510a', width=2), name='L0')
-                     ])
-    fig.add_traces([go.Scatter(x=times, y=values[1, :], \
+    fig = go.Figure()
+    fig.add_traces([go.Scatter(x=times, y=values[0, :], \
+                                line=dict(color='#8c510a', width=2), name='L0'),
+                     go.Scatter(x=times, y=values[1, :], \
                                line=dict(color='#d8b365', width=2), name='L1'),
                     go.Scatter(x=times, y=values[2, :], \
                                line=dict(color='#f6e8c3', width=2), name='L2'),
