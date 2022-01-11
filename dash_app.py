@@ -5,6 +5,7 @@ from dash import html
 from dash.dependencies import Input, Output
 from plotly import graph_objects as go
 import dash_bootstrap_components as dbc
+from PIL import Image
 
 from collector import *
 
@@ -129,6 +130,7 @@ def sensor_plots():
 
     return [sensor_L0, sensor_L1, sensor_L2, sensor_R0, sensor_R1, sensor_R2]
 
+
 def animate_plots():
     patient_id = get_current_patient()
     if patient_id in get_storage():
@@ -159,6 +161,39 @@ def animate_plots():
     fig.update_layout(title_text='Mean value tendencies', title_x=0.5)
     return fig
 
+
+def create_feet_plot():
+    feet_image = Image.open("feet.png")
+    fig = go.Figure(go.Scatter(
+        x=[1.8, 2, 2.15, 2.7, 2.85, 3.05],
+        y=[7.5, 3.4, 8, 5.8, 1, 5],
+        mode='markers', marker=dict(
+            color='#ff0000',
+            size=30
+        )
+    ))
+    fig.update_yaxes(range=[0,10], showgrid=False, visible=False)
+    fig.update_xaxes(range=[0,5], showgrid=False, visible=False)
+    fig.update_layout(width=1000, height=500,
+                      margin_b=0, margin_t=0, margin_r=0, margin_l=0)
+    fig.add_layout_image(
+        dict(
+            source=feet_image,
+            xref='x',
+            yref='y',
+            x=0,
+            y=0,
+            sizex=5,
+            sizey=10,
+            xanchor='left',
+            yanchor='bottom',
+            sizing='stretch',
+            layer='below'
+        )
+    )
+
+    return fig
+
 def create_layout():
     storage = get_storage()
     set_patient_id(1)
@@ -186,6 +221,10 @@ def create_layout():
                 dbc.Col(html.Div(id='output-info')),
             ]
         ),
+        html.Hr(),
+        html.H2("Feet sensors visualisation", style={'font-family':'Open Sans', 'font-weight':'normal',
+                                                  'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
+        dcc.Graph(id='feet-plot', figure=create_feet_plot()),
         html.Hr(),
         html.H2("Aggregated sensors plot", style={'font-family':'Open Sans', 'font-weight':'normal',
                                                  'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
