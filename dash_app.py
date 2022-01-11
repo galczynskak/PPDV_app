@@ -132,7 +132,7 @@ def sensor_plots():
     return [sensor_L0, sensor_L1, sensor_L2, sensor_R0, sensor_R1, sensor_R2]
 
 
-def animate_plots():
+def animate_mean():
     patient_id = get_current_patient()
     if patient_id in get_storage():
         pd = get_storage()[patient_id]
@@ -160,6 +160,72 @@ def animate_plots():
                 width=2
             )))])
     fig.update_layout(title_text='Mean value tendencies', title_x=0.5)
+    return fig
+
+def animate_max():
+    patient_id = get_current_patient()
+    if patient_id in get_storage():
+        pd = get_storage()[patient_id]
+        times = np.array(pd["df"]["timestamp"])
+        values = [[], [], [], [], [], []]
+        points = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
+        df = pd["df"]
+        for j in range(0, len(points)):
+            for i in range(0, len(df.index)):
+                values[j].append(df[points[j]][i])
+
+        values = np.array(values)
+    else:
+        times = np.array([0])
+        values = np.array([[0]])
+
+    v = []
+    for i in range(0, 6):
+        try:
+            v.append(values[i, :].max())
+        except Exception:
+            v.append(0)
+    fig = go.Figure([go.Scatter(x=['L0', 'L1', 'L2', 'R0', 'R1', 'R2'], y=v, mode='markers', marker=dict(
+        color='#feedde',
+        size=40,
+        line=dict(
+            color='#8c510a',
+            width=2
+        )))])
+    fig.update_layout(title_text='Maximal value tendencies', title_x=0.5)
+    return fig
+
+def animate_min():
+    patient_id = get_current_patient()
+    if patient_id in get_storage():
+        pd = get_storage()[patient_id]
+        times = np.array(pd["df"]["timestamp"])
+        values = [[], [], [], [], [], []]
+        points = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
+        df = pd["df"]
+        for j in range(0, len(points)):
+            for i in range(0, len(df.index)):
+                values[j].append(df[points[j]][i])
+
+        values = np.array(values)
+    else:
+        times = np.array([0])
+        values = np.array([[0]])
+
+    v = []
+    for i in range(0, 6):
+        try:
+            v.append(values[i, :].min())
+        except Exception:
+            v.append(0)
+    fig = go.Figure([go.Scatter(x=['L0', 'L1', 'L2', 'R0', 'R1', 'R2'], y=v, mode='markers', marker=dict(
+        color='#feedde',
+        size=40,
+        line=dict(
+            color='#8c510a',
+            width=2
+        )))])
+    fig.update_layout(title_text='Minimal value tendencies', title_x=0.5)
     return fig
 
 
@@ -234,9 +300,21 @@ def create_layout():
         html.Hr(),
         html.H2("Mean value tendencies", style={'font-family':'Open Sans', 'font-weight':'normal',
                                                  'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
-        dcc.Graph(id='an_sensor', figure=animate_plots()),
+        dbc.Row([
+            dbc.Col([
+                dcc.Graph(id='an_min', figure=animate_min()),
+                dcc.Interval(id='input-min-animate', interval=1000, n_intervals=0)
+            ]),
+            dbc.Col([
+                dcc.Graph(id='an_mean', figure=animate_mean()),
+                dcc.Interval(id='input-mean-animate', interval=1000, n_intervals=0)
+            ]),
+            dbc.Col([
+                dcc.Graph(id='an_max', figure=animate_max()),
+                dcc.Interval(id='input-max-animate', interval=1000, n_intervals=0)
+            ])
+        ]),
         html.Hr(),
-        dcc.Interval(id='input-sensor-animate', interval=1000, n_intervals=0),
         html.H2("Detailed sensors plots", style={'font-family':'Open Sans', 'font-weight':'normal',
                                                  'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
         dbc.Row(
@@ -299,10 +377,20 @@ def graph_update(n_intervals):
 def update_sensor_graphs(n_intervals):
     return sensor_plots()
 
-@app.callback(Output(component_id='an_sensor', component_property='figure'),
-              [Input(component_id='input-sensor-animate', component_property='n_intervals')])
-def update_animated_grphs(n_intervals):
-    return animate_plots()
+@app.callback(Output(component_id='an_mean', component_property='figure'),
+              [Input(component_id='input-mean-animate', component_property='n_intervals')])
+def update_animated_mean(n_intervals):
+    return animate_mean()
+
+@app.callback(Output(component_id='an_max', component_property='figure'),
+              [Input(component_id='input-max-animate', component_property='n_intervals')])
+def update_animated_max(n_intervals):
+    return animate_max()
+
+@app.callback(Output(component_id='an_min', component_property='figure'),
+              [Input(component_id='input-min-animate', component_property='n_intervals')])
+def update_animated_min(n_intervals):
+    return animate_min()
 
 @app.callback(Output(component_id='data-gathering', component_property="children"),
               Input('gather-data', 'n_clicks'))
