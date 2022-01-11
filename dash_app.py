@@ -149,10 +149,13 @@ def animate_mean():
         times = np.array([0])
         values = np.array([[0]])
 
-    v = []
+    mean_sensors = []
     for i in range(0, 6):
-        v.append(values[i, :].mean())
-    fig = go.Figure([go.Scatter(x=['L0', 'L1', 'L2', 'R0', 'R1', 'R2'], y=v, mode='markers', marker=dict(
+        try:
+            mean_sensors.append(round(values[i, :].mean(), 2))
+        except Exception:
+            mean_sensors.append(0)
+    fig = go.Figure([go.Scatter(x=['L0', 'L1', 'L2', 'R0', 'R1', 'R2'], y=mean_sensors, mode='markers', marker=dict(
             color='#feedde',
             size=40,
             line=dict(
@@ -306,12 +309,12 @@ def create_layout():
                 dcc.Interval(id='input-min-animate', interval=1000, n_intervals=0)
             ]),
             dbc.Col([
-                dcc.Graph(id='an_mean', figure=animate_mean()),
-                dcc.Interval(id='input-mean-animate', interval=1000, n_intervals=0)
-            ]),
-            dbc.Col([
                 dcc.Graph(id='an_max', figure=animate_max()),
                 dcc.Interval(id='input-max-animate', interval=1000, n_intervals=0)
+            ]),
+            dbc.Col([
+                dcc.Graph(id='an_mean', figure=animate_mean()),
+                dcc.Interval(id='input-mean-animate', interval=1000, n_intervals=0)
             ])
         ]),
         html.Hr(),
