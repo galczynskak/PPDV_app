@@ -14,7 +14,10 @@ class DataCollectorThread(threading.Thread):
             if not stop_collector:
                 expire_data(15)
                 for i in range(1, 7):
-                    add_measurements(i, get_new_data(i))
+                    try:
+                        add_measurements(i, get_new_data(i))
+                    except Exception:
+                        continue
                 time.sleep(1)
 
 

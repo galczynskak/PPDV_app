@@ -163,15 +163,20 @@ def animate_plots():
 
 
 def create_feet_plot():
+    cols = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
+    data = get_storage()[get_current_patient()]['df'][cols]
     feet_image = Image.open("feet.png")
     fig = go.Figure(go.Scatter(
         x=[1.8, 2, 2.15, 2.7, 2.85, 3.05],
         y=[7.5, 3.4, 8, 5.8, 1, 5],
-        mode='markers', marker=dict(
-            color='#ff0000',
+        mode='markers',
+        marker=dict(
+            color="white",
+            gradient=dict(color='#ff0000', type="radial"),
             size=30
-        )
+        ),
     ))
+
     fig.update_yaxes(range=[0,10], showgrid=False, visible=False)
     fig.update_xaxes(range=[0,5], showgrid=False, visible=False)
     fig.update_layout(width=1000, height=500,
@@ -208,8 +213,9 @@ def create_layout():
             [
                 dbc.Col(html.Button('STOP/ACTIVATE\nDATA GATHERING', id='gather-data', n_clicks=0,
                                     style = {'font-family':'Open Sans', 'font-weight':'normal',
-                                             'background-color': '#feedde', 'font-size':16, 'margin-left':10,
-                                             'color': 'black','height': '50px','width': '200px'})),
+                                             'background-color': 'whitesmoke', 'font-size':16, 'margin-left':10,
+                                             'color': 'black','height': '50px','width': '200px',
+                                             "border-radius":8, "box-shadow":"2px 2px 1px 1px lightgrey"})),
                 dbc.Col(html.Div(id='data-gathering')),
                 dbc.Col(dcc.Dropdown(
                     id='input-dropdown',
@@ -224,7 +230,8 @@ def create_layout():
         html.Hr(),
         html.H2("Feet sensors visualisation", style={'font-family':'Open Sans', 'font-weight':'normal',
                                                   'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
-        dcc.Graph(id='feet-plot', figure=create_feet_plot()),
+        html.Div(dcc.Graph(id='feet-plot', figure=create_feet_plot()), style={'margin':'auto', "display":'flex', 'justify-content':"center"}),
+        dcc.Interval(id='input-sensor-feet', interval=1000, n_intervals=0),
         html.Hr(),
         html.H2("Aggregated sensors plot", style={'font-family':'Open Sans', 'font-weight':'normal',
                                                  'text-align':'center', 'margin-bottom':20, 'background-color':'whitesmoke'}),
@@ -272,7 +279,12 @@ def create_layout():
 def define_parameters(patient_id):
     storage = get_storage()
     set_patient_id(patient_id)
-    return html.Div(html.H4("Presenting data for patient: " + storage[patient_id]["fullname"], style={'font-family':'Open Sans', 'font-weight':'normal'}))
+    return html.Div([html.H3("Currently displaying data for patient:", style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("Fullname: " + storage[patient_id]["fullname"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("Detailed name: " + storage[patient_id]["name"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("Birthdate: " + storage[patient_id]["name"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("Disability: " + storage[patient_id]["disabled"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("ID: " + storage[patient_id]["id"], style={'font-family':'Open Sans', 'font-weight':'normal'})])
 
 
 @app.callback(Output(component_id='output-plot', component_property='figure'),
@@ -325,3 +337,8 @@ def update_anomalies(n_intervals):
             style_cell={'textAlign':'center','font-family':'Open Sans'},
             style_table={'width':'80%', 'margin-right':'auto', 'margin-left':'auto'}
     ))
+
+@app.callback(Output(component_id='feet-plot', component_property='figure'),
+              [Input(component_id='input-sensor-feet', component_property='n_intervals')])
+def update_animated_grphs(n_intervals):
+    return create_feet_plot()
