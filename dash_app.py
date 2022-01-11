@@ -6,6 +6,7 @@ from dash.dependencies import Input, Output
 from plotly import graph_objects as go
 import dash_bootstrap_components as dbc
 from PIL import Image
+import plotly.express as px
 
 from collector import *
 
@@ -166,34 +167,27 @@ def create_feet_plot():
     cols = ["L0_value", "L1_value", "L2_value", "R0_value", "R1_value", "R2_value"]
     data = get_storage()[get_current_patient()]['df'][cols]
     feet_image = Image.open("feet.png")
-    fig = go.Figure(go.Scatter(
-        x=[1.8, 2, 2.15, 2.7, 2.85, 3.05],
-        y=[7.5, 3.4, 8, 5.8, 1, 5],
-        mode='markers',
-        marker=dict(
-            color="white",
-            gradient=dict(color='#ff0000', type="radial"),
-            size=30
-        ),
+    if(len(data) > 0):
+        vals = (data.iloc[-1]).to_list()
+    else:
+        vals = [0, 0, 0, 0, 0, 0]
+    fig = go.Figure(px.scatter(
+        x=[1.8, 2, 2.15, 2.7, 2.85, 3.05], y=[7.5, 3.4, 8, 5.8, 1, 5], size=vals, size_max=60
     ))
 
     fig.update_yaxes(range=[0,10], showgrid=False, visible=False)
     fig.update_xaxes(range=[0,5], showgrid=False, visible=False)
     fig.update_layout(width=1000, height=500,
                       margin_b=0, margin_t=0, margin_r=0, margin_l=0)
+    fig.update_traces(marker=dict(color="white", gradient=dict(color="darkcyan", type="radial")))
     fig.add_layout_image(
         dict(
             source=feet_image,
-            xref='x',
-            yref='y',
-            x=0,
-            y=0,
-            sizex=5,
-            sizey=10,
-            xanchor='left',
-            yanchor='bottom',
-            sizing='stretch',
-            layer='below'
+            xref='x', yref='y',
+            x=0, y=0,
+            sizex=5, sizey=10,
+            xanchor='left', yanchor='bottom',
+            sizing='stretch', layer='below'
         )
     )
 
@@ -225,7 +219,7 @@ def create_layout():
                     value=1
                 )),
                 dbc.Col(html.Div(id='output-info')),
-            ]
+            ], justify="center", align="center"
         ),
         html.Hr(),
         html.H2("Feet sensors visualisation", style={'font-family':'Open Sans', 'font-weight':'normal',
@@ -280,11 +274,13 @@ def define_parameters(patient_id):
     storage = get_storage()
     set_patient_id(patient_id)
     return html.Div([html.H3("Currently displaying data for patient:", style={'font-family':'Open Sans', 'font-weight':'normal'}),
-                     html.H4("Fullname: " + storage[patient_id]["fullname"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
-                     html.H4("Detailed name: " + storage[patient_id]["name"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
-                     html.H4("Birthdate: " + storage[patient_id]["name"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
-                     html.H4("Disability: " + storage[patient_id]["disabled"], style={'font-family':'Open Sans', 'font-weight':'normal'}),
-                     html.H4("ID: " + storage[patient_id]["id"], style={'font-family':'Open Sans', 'font-weight':'normal'})])
+                     html.H4("Fullname: " + str(storage[patient_id]["fullname"]), style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("Detailed name: " + str(storage[patient_id]["name"]), style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("Birthdate: " + str(storage[patient_id]["birthdate"]), style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("Disability: " + str(storage[patient_id]["disabled"]), style={'font-family':'Open Sans', 'font-weight':'normal'}),
+                     html.H4("ID: " + str(storage[patient_id]["id"]), style={'font-family':'Open Sans', 'font-weight':'normal'})],
+                    style={"border-radius":8, "box-shadow":"2px 2px 1px 1px lightgrey", "border":2, "border-color":"black",
+                           "border-style":'solid', "background":"whitesmoke", "padding-left":10, "line-height":6})
 
 
 @app.callback(Output(component_id='output-plot', component_property='figure'),
