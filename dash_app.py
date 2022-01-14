@@ -435,18 +435,18 @@ def update_data_gathering(n_clicks):
 @app.callback(Output(component_id='live_data', component_property='children'),
               Input(component_id='data-interval', component_property='n_intervals'))
 def update_anomalies(n_intervals):
-    df = get_storage()['anomalies']
-    titles = ["Patient full name", "Measurement ID", "Time", "Sensor ID", "Sensor value"]
-    return html.Div(
-        dash_table.DataTable(
+    df = get_storage()['anomalies'][-20:]
+    titles = ["Patient full name", "Measurement ID", "Time", "Sensor ID", "Sensor value",
+              "patient_full_name", "measurement_id", "timestamp", "sensor", "sensor_value"]
+    return dash_table.DataTable(
             id='anomalies-table',
-            columns=[{"name": i, "id": i} for i in titles],
-            data=df.to_dict('records'),
+            columns=[{"name": titles[i], "id": titles[i+5]} for i in range(5)],
+            data=df.to_dict(orient='records'),
             style_header={'backgroundColor': "tomato", 'text-align': 'center',
                           'font-family': 'Open Sans', 'color': 'white'},
-            style_cell={'textAlign': 'center', 'font-family': 'Open Sans'},
+            style_cell={'textAlign': 'center', 'font-family': 'Open Sans', 'color':'dimgray'},
             style_table={'width': '80%', 'margin-right': 'auto', 'margin-left': 'auto'}
-        ))
+        )
 
 
 @app.callback(Output(component_id='feet-plot', component_property='figure'),

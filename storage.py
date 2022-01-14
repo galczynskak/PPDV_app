@@ -51,8 +51,8 @@ def update_anomalies(patient_id, data):
     indexes = _storage["anomalies"].columns
     sensor_names = {4: "L0", 6: "L1", 8: "L2", 10: "R0", 12: "R1", 14: "R2"}
     for i in sensor_names.keys():
-        if data[i] == "True":
-            patient_name = _storage[patient_id]["firstname"] + ' ' + _storage[patient_id]["lastname"]
+        if data[i]:
+            patient_name = _storage[patient_id]["fullname"]
             series_data = [patient_name, data[0], data[2], sensor_names[i], data[i - 1]]
             series = pd.Series(series_data, index=indexes)
             _storage["anomalies"] = _storage["anomalies"].append(series, ignore_index=True)

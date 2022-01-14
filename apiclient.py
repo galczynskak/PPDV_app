@@ -10,7 +10,7 @@ def get_new_data(id):
 
     t = time.time()
     data = [js["trace"]["id"], t, datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S'),
-            js["trace"]["sensors"][0]["value"], js["trace"]["sensors"][0]["anomaly"],
+            js["trace"]["sensors"][0]["value"], True,
             js["trace"]["sensors"][1]["value"], js["trace"]["sensors"][1]["anomaly"],
             js["trace"]["sensors"][2]["value"], js["trace"]["sensors"][2]["anomaly"],
             js["trace"]["sensors"][3]["value"], js["trace"]["sensors"][3]["anomaly"],
